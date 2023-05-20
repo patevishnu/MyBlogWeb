@@ -1,0 +1,16 @@
+
+<%- include("partials/header") -%>
+<h1>Hello</h1>
+<p><%=Content_page%></p>
+<%  for(let i=0;i<foundBlog.length;i++){  %>
+
+  <h2><%=foundBlog[i].Blog_title%></h2>
+
+
+  <p><%=foundBlog[i].Blog_body.substring(0,50)%>
+  ...<a href="/<%=foundBlog[i].Blog_title%>" >Read more</a>
+  </p>
+
+<%   }   %>
+
+<%- include("partials/footer") -%>
