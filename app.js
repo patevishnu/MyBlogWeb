@@ -20,6 +20,145 @@ const BlogSchema={
   Blog_body:String
 };
 const NewBlog=mongoose.model("NewBlog",BlogSchema);
+const NewLoginSchema={
+  user_id:String,
+  password:String
+}
+const NewLoginBlog=mongoose.model('newLoginBlog',NewLoginSchema);
+/***********************************************************************************/
+app.get('/login',function(req,res)
+{
+  res.render('login',{Content_page:"Login with your Credentials"});
+})
+app.get('/signup',function(req,res)
+{
+  res.render('signup',{Content_page:"Create your user id and password "});
+})
+let Users=[];
+let Users_new=[];
+let logged_in=0;
+app.post('/signpost',function(req,res)
+{
+
+  NewLoginBlog.find({})
+  .then(function(loginData)
+{
+
+  for(let i=0;i<loginData.length;i++)
+  {
+    let newUser = {id:loginData[i].user_id, password: loginData[i].password};
+    Users_new.push(newUser);
+  }
+
+  for(let i=0;i<Users_new.length;i++)
+        {
+        if(Users_new[i].id===req.body.id)
+        {
+          res.render('login',{Content_page:"User already exist"});
+          alert("User already exist ")
+        }
+      }
+
+      console.log(req.body.id);
+      let NewLogin=new NewLoginBlog({
+        user_id:req.body.id,
+        password:req.body.password
+      });
+      NewLogin.save();
+
+      res.redirect('/login');
+
+      }
+)
+.catch(function(err)
+{
+  if(err)
+  {
+    console.log(err);
+  }
+  else
+  {
+    console.log("successfully saved");
+  }
+});
+})
+
+let User_Page_blogs="";
+app.post('/loginpost',function(req,res)
+{
+
+  NewLoginBlog.find({})
+  .then(function(loginData)
+{
+  for(let i=0;i<loginData.length;i++)
+  {
+    let newUser = {id:loginData[i].user_id, password: loginData[i].password};
+    Users.push(newUser);
+  }
+
+  if(!req.body.id || !req.body.password){
+     res.render('login');
+  } else {
+     console.log("vishnu pate hi ");
+     console.log(Users.length);
+     console.log(Users[0].id);
+     console.log(req.body.id);
+     for(let i=0;i<Users.length;i++)
+     {
+       console.log("hi vishnu pate vishnu pate");
+        if(Users[i].id === req.body.id && Users[i].password === req.body.password){
+           User_Page=Users[i].id;
+           res.redirect('/person/'+User_Page);
+        }
+     }
+
+     res.render('login',{Content_page:"Invalid Credentials"});
+     alert("Invalid Credentials")
+  }
+
+})
+.catch(function(err)
+{
+  if(err)
+  {
+    console.log(err);
+  }
+  else
+  {
+    console.log("successfully saved");
+  }
+
+});
+});
+let x=0;
+app.get("/person/:User_Page",function(req,res)
+{
+  logged_in=1;
+  User_Page=req.params.User_Page;
+//  User_Page_blogs =(mongoose.models.User_Page || mongoose.model(User_Page, BlogSchema));
+  if (!mongoose.connection.models[User_Page]) {
+  mongoose.model(User_Page, BlogSchema);
+}
+ User_Page_blogs= mongoose.model(User_Page);
+//  User_Page=mongoose.model(req.params.User_Page,BlogSchema);
+  User_Page_blogs.find({})
+  .then(function(foundBlog)
+  {
+  res.render("home",{Content_page:homeStartingContent,foundBlog:foundBlog});
+  })
+  .catch(function(err)
+  {
+  if(err)
+  {
+    console.log(err);
+  }
+  else
+  {
+    console.log("successfully saved");
+  }
+  });
+
+});
 
 
 
@@ -29,10 +168,16 @@ const NewBlog=mongoose.model("NewBlog",BlogSchema);
 
 
 
+/************************************************************************************/
 
 app.get("/",function(req,res)
 {
-  NewBlog.find({})
+  if(logged_in==0)
+  {
+    res.redirect("/login");
+  }
+  console.log(User_Page_blogs);
+  User_Page_blogs.find({})
   .then(function(foundBlog)
 {
   res.render("home",{Content_page:homeStartingContent,foundBlog:foundBlog});
@@ -55,6 +200,11 @@ app.get("/",function(req,res)
 
 app.get("/about",function(req,res)
 {
+  if(logged_in==0)
+  {
+    res.redirect("/login");
+  }
+  console.log("about");
   res.render("about",{Content_page:aboutContent});
 })
 
@@ -62,6 +212,10 @@ app.get("/about",function(req,res)
 
 app.get("/contact",function(req,res)
 {
+  if(logged_in==0)
+  {
+    res.redirect("/login");
+  }
   res.render("contact",{Content_page:contactContent});
 })
 
@@ -69,18 +223,27 @@ app.get("/contact",function(req,res)
 
 app.get("/compose",function(req,res)
 {
+  if(logged_in==0)
+  {
+    res.redirect("/login");
+  }
   res.render("compose");
 })
 
 
 app.post("/compose",function(req,res)
 {
-
+  if(logged_in==0)
+  {
+    res.redirect("/login");
+  }
+  console.log(User_Page_blogs);
   var post={title:req.body.postTitle,Body:req.body.postBody};
    allPost.push(post);
   let BlogTitle=req.body.postTitle;
   let BlogBody=req.body.postBody;
-  let newBlog=new NewBlog({
+//  let newpblog=mongoose.model(User_Page,BlogSchema);
+  let newBlog=new User_Page_blogs({
     Blog_title:BlogTitle,
     Blog_body:BlogBody
   })
@@ -88,14 +251,14 @@ app.post("/compose",function(req,res)
 
 
 
-   res.redirect("/");
+   res.redirect("/person/"+User_Page);
 })
 
-app.get("/:userId",function(req,res)
+app.get("/post/:userId",function(req,res)
 {
   const requested=_.lowerCase(req.params.userId);
-
-   NewBlog.find({})
+   console.log("Hi vishnu read more");
+  User_Page_blogs.find({})
    .then(function(FoundItems)
  {
    for(let i=0;i<FoundItems.length;i++)
@@ -109,7 +272,7 @@ app.get("/:userId",function(req,res)
      }
 
    }
-   res.redirect("/"+requested);
+   res.redirect("/post/"+requested);
  })
  .catch(function(err)
 {
