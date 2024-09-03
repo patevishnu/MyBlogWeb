@@ -1,0 +1,31 @@
+
+<%- include("partials/header") -%>
+<table>
+  <tr>
+    <td>  <p style="width:50vw;margin:auto;"><%=Content_page%></p></td>
+     <td>
+       <h1>Your Blogs</h1>
+       </td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+        <%  for(let i=0;i<foundBlog.length;i++){  %>
+
+        <h2><%=foundBlog[i].Blog_title%></h2>
+
+
+        <p><%=foundBlog[i].Blog_body.substring(0,50)%>
+        ...<a href="/post/<%=foundBlog[i].Blog_title%>" >Read more</a>
+        </p>
+
+      <%   }   %>
+    </td>
+
+  </tr>
+
+</table>
+
+
+
+<%- include("partials/footer") -%>

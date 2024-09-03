@@ -1,0 +1,40 @@
+
+<%- include("partials/header") -%>
+
+<div style="width:50vw;margin:auto;text-align:center"><%=Content_page%></div>
+<div class="main">
+
+            <form action="/signpost" method="post">
+                  <label for="first">
+                        Username:
+                  </label>
+                  <input type="text"
+                         id="first"
+                         name="id"
+                         placeholder="Create your Username" required>
+
+                  <label for="password">
+                        Password:
+                  </label>
+                  <input type="password"
+                         id="password"
+                         name="password"
+                         placeholder="Create your Password" required>
+
+                  <div class="wrap">
+                        <button type="submit"
+                                onclick="solve()">
+                              Submit
+                        </button>
+                  </div>
+            </form>
+            <p> registered?
+                  <a href="/login"
+                     style="text-decoration: none;">
+                        Login
+                  </a>
+            </p>
+      </div>
+
+
+<%- include("partials/footer") -%>
